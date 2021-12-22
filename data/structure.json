@@ -1,0 +1,19 @@
+{
+  "channel": "",
+  "owner": "uid",
+  "members": [
+    {
+      "member": "id",
+      "perm": "readonly/readnwrite"
+    }
+  ],
+  "fs": {
+    "FolderName": {
+      "type": "folder",
+      "fileName": {
+        "type": "file",
+        "messageId": ""
+      }
+    }
+  }
+}
