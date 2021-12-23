@@ -46,16 +46,19 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", (message) => {
-  // Split message into array
-  const args: string[] = message.content
-    .substring(global.config.prefix.length)
-    .split(/\s+/);
+  if (message.content.startsWith(global.config.prefix)) {
+    // Split message into array
+    const args: string[] = message.content
+      .substring(global.config.prefix.length)
+      .split(/\s+/);
 
-  // Check if first arg is an existing command
-  if (client.commands.has(args[0].toLowerCase())) {
     // @ts-ignore
-    const command: Command = client.commands.get(args[0].toLowerCase());
-    command.run(client, message, args);
+    const command: Command =
+      client.commands.get(args[0]) ||
+      // @ts-ignore
+      client.commands.find((c) => c.aliases?.includes(args[0]));
+
+    if (command) command.run(client, message, args);
   }
 });
 

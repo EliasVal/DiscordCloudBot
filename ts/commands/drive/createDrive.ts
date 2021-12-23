@@ -21,6 +21,7 @@ export const command: Command = {
         JSON.stringify({
           channel: channel?.id,
           owner: message.author.id,
+          cwd: "/",
           fs: {
             "/": {
               type: "folder",

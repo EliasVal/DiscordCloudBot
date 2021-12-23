@@ -4,6 +4,7 @@ declare global {
   interface Drive {
     name: string;
     owner: string;
+    cwd: string;
     members: Member[];
     fs: Folder | File;
   }
