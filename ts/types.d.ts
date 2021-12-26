@@ -6,7 +6,7 @@ declare global {
     owner: string;
     cwd: string;
     members: Member[];
-    fs: Folder | File;
+    fs: Object<Folder | File>;
   }
 
   interface Member {
@@ -18,10 +18,11 @@ declare global {
     type: "file";
     messageID: string;
   }
-
+  
   interface Folder {
-    type: "folder";
-    [key: string]: File;
+    // ! OPTIONAL ONLY FOR DELETION WHEN USING THE LS COMMAND
+    type?: "folder";
+    [key: string]: File | Folder;
   }
 
   interface _Client extends Client {
