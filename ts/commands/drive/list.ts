@@ -6,16 +6,13 @@ export const command: Command = {
   aliases: ["ls", "dir"],
   run: async function (client, message, args) {
     await message.channel.sendTyping();
-    const file = await GetDriveData(message.channel.id);
+    const drive = await GetDriveData(message.channel.id);
 
-    let obj: Folder = file.fs;
-    let splitWorkingDir = file.cwd.split("/");
+    let obj: Folder = drive.fs;
+    let splitWorkingDir = ["/", ...drive.cwd.split("/")];
 
     // Remove empty elements
     splitWorkingDir = splitWorkingDir.filter((dir) => dir);
-
-    // Add "/" to signify root if array is empty.
-    if (splitWorkingDir.length == 0) splitWorkingDir[0] = "/";
 
     // "CD" into Current Working Directory
     for (let dir of splitWorkingDir) {
@@ -28,9 +25,7 @@ export const command: Command = {
     let files = Object.keys(obj);
 
     // Set header to current working directory
-    let msg = `\`\`\`${splitWorkingDir[0] != "/" ? "/" : ""}${
-      splitWorkingDir[splitWorkingDir.length - 1]
-    }`;
+    let msg = `\`\`\`\n${drive.cwd}`;
 
     // Iterate through files & folders
     for (let [index, file] of files.entries()) {
