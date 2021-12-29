@@ -34,13 +34,29 @@ declare global {
     name: string;
     aliases?: string[];
     run: function(_Client, Message, string[]);
+    syntax: string;
   }
 
   var config: {
     prefix: string;
+    colors: {
+      warn: string,
+      err: string,
+      main: string,
+      success: string
+    },
+    dev: string;
   };
 
   var appRoot: string;
+  
+  class Err extends Error {
+    constructor(message: string, code: string) {
+      super(message),
+      this.code = code;
+      this.name = "DriveError"
+    }
+  }
 }
 
 export {}

@@ -4,6 +4,7 @@ export const command: Command = {
   description: "List all files in current working directory",
   name: "list",
   aliases: ["ls", "dir"],
+  syntax: "list",
   run: async function (client, message, args) {
     await message.channel.sendTyping();
     const drive = await GetDriveData(message.channel.id);

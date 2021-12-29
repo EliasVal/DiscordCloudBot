@@ -1,3 +1,4 @@
+import { Message, MessageEmbed } from "discord.js";
 import { readFileSync, readFile, writeFile, writeFileSync } from "fs";
 
 /**
@@ -52,5 +53,101 @@ export function WriteDriveData(channelId: string, data: Drive): Promise<void> {
         resolve();
       }
     );
+  });
+}
+
+/**
+ *
+ * @param {Drive} drive The Drive object
+ * @param {string} directory Desired Directory
+ * @returns Resolved Directory
+ */
+export function ResolvePath(drive: Drive, directory: string): string {
+  let desiredDir = directory.split(/\/+/);
+  if (directory.startsWith("/")) desiredDir.unshift("/");
+
+  // Remove empty elements
+  desiredDir = desiredDir.filter((dir) => dir);
+
+  if (directory.startsWith("/")) {
+    while (desiredDir.indexOf("..") != -1) {
+      desiredDir.splice(desiredDir.indexOf("..") - 1, 2);
+    }
+    if (desiredDir.indexOf("/") == -1) {
+      throw new Err("Cannot go back any further than root!", "back-from-root");
+    }
+  } else {
+    desiredDir = ["/", ...drive.cwd.split("/"), ...desiredDir];
+
+    // Remove empty elements
+    desiredDir = desiredDir.filter((dir) => dir);
+
+    while (desiredDir.indexOf("..") != -1) {
+      desiredDir.splice(desiredDir.indexOf("..") - 1, 2);
+    }
+    if (desiredDir.indexOf("/") == -1) {
+      throw new Err("Cannot go back any further than root!", "back-from-root");
+    }
+  }
+
+  let obj = drive.fs;
+
+  // Remove empty elements
+  desiredDir = desiredDir.filter((dir) => dir);
+
+  // "CD" into Current Working Directory
+  for (let dir of desiredDir) {
+    // @ts-ignore
+    obj = obj[dir];
+
+    if (obj == null || obj.type == "file") {
+      throw new Err(
+        "This directory does not exist!",
+        "directory-does-not-exist"
+      );
+    }
+  }
+
+  return desiredDir.join("/").replace(/\/+/g, "/");
+}
+
+export class Err extends Error {
+  code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.code = code;
+    this.name = "DriveError";
+  }
+}
+
+export function handleError(
+  client: _Client,
+  error: Error | Err,
+  message: Message | null = null,
+  args: string[] | null = null
+): void {
+  if (message) {
+    message.reply({
+      embeds: [
+        new MessageEmbed({
+          title: "Something went wrong!",
+          description:
+            "Something went wrong while trying to execute the command. Please try again later.\n\nThe developers have been notified, thank you for your patience",
+          color: "DARK_RED",
+        }),
+      ],
+    });
+  }
+
+  client.users.fetch(global.config.dev).then((dev) => {
+    const embed = new MessageEmbed()
+      .setColor("DARK_RED")
+      .setTitle(error.name)
+      .setDescription(`${"```"}${error.stack}${"```"}`)
+      .addField("Short", `\`${error.message}\``);
+
+    if (args) embed.addField("Command Executed", `\`${args.join(" ")}\``);
+
+    dev.send({ embeds: [embed] });
   });
 }

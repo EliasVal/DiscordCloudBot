@@ -3,6 +3,7 @@ import { writeFileSync } from "fs";
 export const command: Command = {
   name: "create",
   description: "Creates a drive",
+  syntax: "create {driveName}",
   run: async function (client, message, args) {
     if (args[1] && args[1].match(/\S+/)) {
       const channel = await message.guild?.channels.create(args[1], {

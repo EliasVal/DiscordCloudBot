@@ -1,7 +1,7 @@
 import * as discord from "discord.js";
 import { readFileSync, readdirSync } from "fs";
 import { config as dotenv } from "dotenv";
-
+import { handleError, Err } from "./utils";
 dotenv();
 
 // Set approot
@@ -58,8 +58,30 @@ client.on("messageCreate", (message) => {
       // @ts-ignore
       client.commands.find((c) => c.aliases?.includes(args[0]));
 
-    if (command) command.run(client, message, args);
+    try {
+      if (command)
+        // Catch block if command ran is async
+        command.run(client, message, args).catch((e: any) => {
+          if (e instanceof Err) {
+            const embed = new discord.MessageEmbed()
+              .setColor("DARK_RED")
+              .setTitle(e.message);
+            message.reply({ embeds: [embed] });
+          } else handleError(client, e, message, args);
+        });
+      // Try...catch if command ran is sync
+    } catch (e: any) {
+      if (e instanceof Err) {
+        const embed = new discord.MessageEmbed()
+          .setColor("DARK_RED")
+          .setTitle(e.message);
+        message.reply({ embeds: [embed] });
+      } else handleError(client, e, message, args);
+    }
   }
 });
+
+// Catch errors not caused by command execution
+process.on("uncaughtException", (err) => handleError(client, err));
 
 client.login(process.env.TOKEN);
