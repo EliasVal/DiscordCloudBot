@@ -13,10 +13,10 @@ export const command: Command = {
     if (args[2]) path = ResolvePath(drive, args[2]);
     else path = drive.cwd;
 
-    if (args[1].includes("/")) {
-      message.reply("A directory cannot have a `/` in it's name!");
-      return;
-    }
+    if (args[1].includes("/"))
+      throw new Err("File names cannot contain a `/`!", "illegal-file-name");
+    else if (args[1].match(/\s/))
+      throw new Err("File names cannot contain a space!", "illegal-file-name");
 
     path = path.split("/");
     path = path.filter((dir) => dir);

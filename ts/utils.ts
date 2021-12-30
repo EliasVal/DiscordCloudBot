@@ -62,9 +62,16 @@ export function WriteDriveData(channelId: string, data: Drive): Promise<void> {
  * @param {string} directory Desired Directory
  * @returns Resolved Directory
  */
-export function ResolvePath(drive: Drive, directory: string): string {
+export function ResolvePath(
+  drive: Drive,
+  directory: string,
+  allowFile: boolean = false
+): string {
   let desiredDir = directory.split(/\/+/);
   if (directory.startsWith("/")) desiredDir.unshift("/");
+
+  if (directory.match(/\s/g))
+    throw new Err("File names cannot contain a space!", "illegal-file-name");
 
   // Remove empty elements
   desiredDir = desiredDir.filter((dir) => dir);
@@ -100,7 +107,12 @@ export function ResolvePath(drive: Drive, directory: string): string {
     // @ts-ignore
     obj = obj[dir];
 
-    if (obj == null || obj.type == "file") {
+    if (
+      obj == null ||
+      (desiredDir.indexOf(dir) != desiredDir.length - 1 &&
+        obj.type == "file" &&
+        !allowFile)
+    ) {
       throw new Err(
         "This directory does not exist!",
         "directory-does-not-exist"

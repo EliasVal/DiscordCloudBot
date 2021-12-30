@@ -28,15 +28,17 @@ export const command: Command = {
     // Set header to current working directory
     let msg = `\`\`\`\n${drive.cwd}`;
 
-    // Iterate through files & folders
-    for (let [index, file] of files.entries()) {
-      // Add └ and ┝ accordingly, and also add "/" at the end of the filename if its a folder.
-      if (index != files.length - 1) {
-        msg += `\n┝ ${file}${obj[file].type == "folder" ? "/" : ""}`;
-      } else {
-        msg += `\n└ ${file}${obj[file].type == "folder" ? "/" : ""}\`\`\``;
+    if (files.length > 0) {
+      // Iterate through files & folders
+      for (let [index, file] of files.entries()) {
+        // Add └ and ┝ accordingly, and also add "/" at the end of the filename if its a folder.
+        if (index != files.length - 1) {
+          msg += `\n┝ ${file}${obj[file].type == "folder" ? "/" : ""}`;
+        } else {
+          msg += `\n└ ${file}${obj[file].type == "folder" ? "/" : ""}\`\`\``;
+        }
       }
-    }
+    } else msg += "\nThis directory is empty!```";
 
     message.channel.send(msg);
   },
