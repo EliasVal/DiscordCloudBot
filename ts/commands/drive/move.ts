@@ -1,4 +1,4 @@
-import { GetDriveData, ResolvePath, WriteDriveData } from "../../utils";
+import { GetDriveData, ResolvePath, WriteDriveData, Err } from "../../utils";
 
 export const command: Command = {
   description: "Moves a file or a folder to a new location",
@@ -8,12 +8,9 @@ export const command: Command = {
   run: async function (client, message, args) {
     const drive = await GetDriveData(message.channel.id);
 
-    if (!args[1]) throw new Err("Please provide a path!", "path-not-provided");
+    if (!args[1]) throw new Err("Please provide a path!", "missing-argument");
     if (!args[2])
-      throw new Err(
-        "Please provide a destination path!",
-        "destination-not-provided"
-      );
+      throw new Err("Please provide a destination path!", "missing-argument");
 
     let pathStr = ResolvePath(drive, args[1], true);
     let destinationStr = ResolvePath(drive, args[2]);

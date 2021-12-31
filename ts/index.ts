@@ -46,6 +46,7 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", (message) => {
+  if (message.channel.type == "DM" || message.author.bot) return;
   if (message.content.startsWith(global.config.prefix)) {
     // Split message into array
     const args: string[] = message.content

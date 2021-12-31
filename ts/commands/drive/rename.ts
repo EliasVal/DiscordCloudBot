@@ -1,4 +1,10 @@
-import { GetDriveData, ResolvePath, WriteDriveData, Err } from "../../utils";
+import {
+  GetDriveData,
+  ResolvePath,
+  WriteDriveData,
+  Err,
+  ValidateFilename,
+} from "../../utils";
 
 export const command: Command = {
   description: "Renames a file or a directory",
@@ -8,12 +14,9 @@ export const command: Command = {
   run: async function (client, message, args) {
     const drive = await GetDriveData(message.channel.id);
 
-    if (!args[1]) throw new Err("Please provide a path!", "path-not-provided");
-    if (!args[2]) throw new Err("Please provide a name!", "name-not-provided");
-    else if (args[2].includes("/"))
-      throw new Err("File names cannot contain a `/`!", "illegal-file-name");
-    else if (args[2].match(/\s/))
-      throw new Err("File names cannot contain a space!", "illegal-file-name");
+    if (!args[1]) throw new Err("Please provide a path!", "missing-argument");
+    if (!args[2]) throw new Err("Please provide a name!", "missing-argument");
+    ValidateFilename(args[2]);
 
     let resolvedPath = ResolvePath(drive, args[1], true);
 

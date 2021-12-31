@@ -7,7 +7,7 @@ export const command: Command = {
   run: async function (client, message, args) {
     const drive = await GetDriveData(message.channel.id);
 
-    if (!args[1]) throw new Err("Please provide a path!", "path-not-provided");
+    if (!args[1]) throw new Err("Please provide a path!", "missing-argument");
 
     let resolvedPath = ResolvePath(drive, args[1], true);
 
@@ -23,6 +23,12 @@ export const command: Command = {
       obj = obj[dir];
     }
 
+    if (obj[pathHead].type == "file") {
+      const msg = await message.channel.messages
+        .fetch(obj[pathHead].messageId)
+        .catch();
+      msg && msg.delete();
+    }
     delete obj[pathHead];
 
     await WriteDriveData(message.channel.id, drive);

@@ -49,14 +49,6 @@ declare global {
   };
 
   var appRoot: string;
-  
-  class Err extends Error {
-    constructor(message: string, code: string) {
-      super(message),
-      this.code = code;
-      this.name = "DriveError"
-    }
-  }
 }
 
 export {}

@@ -57,9 +57,10 @@ export function WriteDriveData(channelId: string, data: Drive): Promise<void> {
 }
 
 /**
- *
+ * Resolves and validates a path
  * @param {Drive} drive The Drive object
  * @param {string} directory Desired Directory
+ * @param {boolean} allowFile Whether to allow or disallow files in path
  * @returns Resolved Directory
  */
 export function ResolvePath(
@@ -123,15 +124,22 @@ export function ResolvePath(
   return desiredDir.join("/").replace(/\/+/g, "/");
 }
 
-export class Err extends Error {
-  code: string;
-  constructor(message: string, code: string) {
-    super(message);
-    this.code = code;
-    this.name = "DriveError";
-  }
+/**
+ * Ensures that a filename doesn't include spaces or forward slashes.
+ *
+ * \
+ * **Will throw an error if fails to validate.**
+ *
+ * @param {string} name The filename
+ */
+export function ValidateFilename(name: string) {
+  if (name.includes("/"))
+    throw new Err("File names cannot contain a `/`!", "illegal-file-name");
+  else if (name.match(/(\s)|(\n)/))
+    throw new Err("File names cannot contain a space!", "illegal-file-name");
 }
 
+/** Error Handler */
 export function handleError(
   client: _Client,
   error: Error | Err,
@@ -162,4 +170,14 @@ export function handleError(
 
     dev.send({ embeds: [embed] });
   });
+}
+
+/** Custom Error Class (Extends Error) */
+export class Err extends Error {
+  code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.code = code;
+    this.name = "DriveError";
+  }
 }

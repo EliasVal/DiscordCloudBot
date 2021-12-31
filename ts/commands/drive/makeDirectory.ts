@@ -1,4 +1,10 @@
-import { GetDriveData, ResolvePath, WriteDriveData } from "../../utils";
+import {
+  Err,
+  GetDriveData,
+  ResolvePath,
+  ValidateFilename,
+  WriteDriveData,
+} from "../../utils";
 
 export const command: Command = {
   description: "Creates a directory",
@@ -8,15 +14,13 @@ export const command: Command = {
   run: async function (client, message, args) {
     const drive = await GetDriveData(message.channel.id);
 
-    let path;
+    if (!args[1]) throw new Err("Please provide a name!", "missing-argument");
 
-    if (args[2]) path = ResolvePath(drive, args[2]);
-    else path = drive.cwd;
+    let path: string | string[] = args[2]
+      ? ResolvePath(drive, args[2])
+      : drive.cwd;
 
-    if (args[1].includes("/"))
-      throw new Err("File names cannot contain a `/`!", "illegal-file-name");
-    else if (args[1].match(/\s/))
-      throw new Err("File names cannot contain a space!", "illegal-file-name");
+    ValidateFilename(args[1]);
 
     path = path.split("/");
     path = path.filter((dir) => dir);
